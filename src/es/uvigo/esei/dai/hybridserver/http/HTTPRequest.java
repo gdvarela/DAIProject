@@ -1,6 +1,7 @@
 package es.uvigo.esei.dai.hybridserver.http;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -10,8 +11,13 @@ public class HTTPRequest {
 	
 	private HTTPRequestMethod method;
 	private String httpVersion;
+	private String resourceChain;
+	private String resourceName; //Variable o Calcularlo a partir del resourceChain?
+	private String[] resourcePath;
+	private ArrayList<String> pathList = new ArrayList<String>();
 	private Map<String, String> headerParameters = new HashMap<String, String>();
-	
+	private Map<String, String> resourceParameters = new HashMap<String, String>();
+
 	public HTTPRequest(Reader reader) throws IOException, HTTPParseException {
 		
 		 BufferedReader bufferedReader = new BufferedReader(reader);
@@ -21,24 +27,34 @@ public class HTTPRequest {
 		 
 		 line = bufferedReader.readLine();
 		 
-		 Pattern pattern = Pattern.compile("([A-Z]+) / (HTTP/[0-9.]+)");
+		 Pattern pattern = Pattern.compile("([A-Z]+) (.*) (HTTP/[0-9.]+)");
 		 Matcher matcher = pattern.matcher(line);
 		 matcher.find();
 		 
 		 this.method = HTTPRequestMethod.valueOf(matcher.group(1));
-		 this.httpVersion = matcher.group(2);
+		 this.resourceChain = matcher.group(2);
+		 this.httpVersion = matcher.group(3);
 		 
+		 pattern = Pattern.compile("/([^/].[^/?]*)\\??");
+		 matcher = pattern.matcher(resourceChain);
+		 
+		 while (matcher.find()) {
+			 pathList.add(matcher.group(1));
+		 }
+		 
+		 
+		 resourcePath = new String[pathList.size()];
+			pathList.toArray(resourcePath);
+		 		 	
 		 pattern = Pattern.compile("([A-Za-z-/]+): (.+)");
-		 
-		 while (bufferedReader.ready()) {
-			 line = bufferedReader.readLine();
+		 System.out.println(line);
+		 while ((line = bufferedReader.readLine()) != null) {
 			 System.out.println(line);
 			 matcher = pattern.matcher(line);
 			 if (matcher.find()) {
 				 headerParameters.put(matcher.group(1), matcher.group(2));
 			 }
 		 }		
-		 
 		 System.out.println(this.toString());
 	}
 
@@ -49,17 +65,22 @@ public class HTTPRequest {
 
 	public String getResourceChain() {
 		// TODO Auto-generated method stub
-		return null;
+		return resourceChain;
 	}
 
 	public String[] getResourcePath() {
 		// TODO Auto-generated method stub
-		return null;
+		return resourcePath;
 	}
 
 	public String getResourceName() {
 		// TODO Auto-generated method stub
-		return null;
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < resourcePath.length; i++) {
+			sb.append('/');
+			sb.append(resourcePath[i]);
+		}
+		return sb.substring(1, sb.length());
 	}
 
 	public Map<String, String> getResourceParameters() {
@@ -69,7 +90,7 @@ public class HTTPRequest {
 
 	public String getHttpVersion() {
 		// TODO Auto-generated method stub
-		return null;
+		return httpVersion;
 	}
 
 	public Map<String, String> getHeaderParameters() {
