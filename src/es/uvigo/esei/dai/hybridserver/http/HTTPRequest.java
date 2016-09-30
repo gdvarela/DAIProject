@@ -27,6 +27,31 @@ public class HTTPRequest {
 		 
 		 line = bufferedReader.readLine();
 		 
+//		 Pattern pattern = Pattern.compile("([A-Z]+) (.*) (HTTP/[0-9.]+)");
+//		 Matcher matcher = pattern.matcher(line);
+//		 matcher.find();
+		 
+//		 pattern = Pattern.compile("/([^/].[^/?]*)\\??");
+//		 matcher = pattern.matcher(resourceChain);
+//		 
+//		 while (matcher.find()) {
+//			 pathList.add(matcher.group(1));
+//		 }
+		 
+		 
+//		 resourcePath = new String[pathList.size()];
+//			pathList.toArray(resourcePath);
+//		 		 	
+//		 pattern = Pattern.compile("([A-Za-z-/]+): (.+)");
+//		 System.out.println(line);
+//		 while ((line = bufferedReader.readLine()) != null) {
+//			 System.out.println(line);
+//			 matcher = pattern.matcher(line);
+//			 if (matcher.find()) {
+//				 headerParameters.put(matcher.group(1), matcher.group(2));
+//			 }
+//		 }		
+		 
 		 Pattern pattern = Pattern.compile("([A-Z]+) (.*) (HTTP/[0-9.]+)");
 		 Matcher matcher = pattern.matcher(line);
 		 matcher.find();
@@ -35,17 +60,29 @@ public class HTTPRequest {
 		 this.resourceChain = matcher.group(2);
 		 this.httpVersion = matcher.group(3);
 		 
-		 pattern = Pattern.compile("/([^/].[^/?]*)\\??");
+		 pattern = Pattern.compile("/([^?]*)\\??(.*)");
 		 matcher = pattern.matcher(resourceChain);
+		 matcher.find();
+		 
+		 this.resourceName = matcher.group(1);
+		 String parameters = matcher.group(2);
+		 
+		 pattern = Pattern.compile("([^/].[^/]*)");
+		 matcher = pattern.matcher(resourceName);
 		 
 		 while (matcher.find()) {
 			 pathList.add(matcher.group(1));
 		 }
-		 
-		 
 		 resourcePath = new String[pathList.size()];
-			pathList.toArray(resourcePath);
-		 		 	
+		 pathList.toArray(resourcePath);
+		 
+		 pattern = Pattern.compile("([^&].[^&]*)=([^&].[^&]*)");
+		 matcher = pattern.matcher(parameters);
+		 
+		 while (matcher.find()) {
+			 resourceParameters.put(matcher.group(1), matcher.group(2));
+		 }
+		 
 		 pattern = Pattern.compile("([A-Za-z-/]+): (.+)");
 		 System.out.println(line);
 		 while ((line = bufferedReader.readLine()) != null) {
@@ -54,7 +91,7 @@ public class HTTPRequest {
 			 if (matcher.find()) {
 				 headerParameters.put(matcher.group(1), matcher.group(2));
 			 }
-		 }		
+		 }
 		 System.out.println(this.toString());
 	}
 
@@ -75,17 +112,12 @@ public class HTTPRequest {
 
 	public String getResourceName() {
 		// TODO Auto-generated method stub
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < resourcePath.length; i++) {
-			sb.append('/');
-			sb.append(resourcePath[i]);
-		}
-		return sb.substring(1, sb.length());
+		return resourceName;
 	}
 
 	public Map<String, String> getResourceParameters() {
 		// TODO Auto-generated method stub
-		return null;
+		return resourceParameters;
 	}
 
 	public String getHttpVersion() {
