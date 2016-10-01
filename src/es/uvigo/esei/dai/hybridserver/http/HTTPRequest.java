@@ -3,6 +3,7 @@ package es.uvigo.esei.dai.hybridserver.http;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -15,8 +16,11 @@ public class HTTPRequest {
 	private String resourceName; //Variable o Calcularlo a partir del resourceChain?
 	private String[] resourcePath;
 	private ArrayList<String> pathList = new ArrayList<String>();
-	private Map<String, String> headerParameters = new HashMap<String, String>();
-	private Map<String, String> resourceParameters = new HashMap<String, String>();
+	
+	//Se utilizan LinkedHashMap en lugar de HashMap para evitar un fallo en HTTPRequest.toString
+	
+	private Map<String, String> headerParameters = new LinkedHashMap<String, String>();
+	private Map<String, String> resourceParameters = new LinkedHashMap<String, String>();
 	private StringBuilder content = new StringBuilder();
 
 	public HTTPRequest(Reader reader) throws IOException, HTTPParseException {
