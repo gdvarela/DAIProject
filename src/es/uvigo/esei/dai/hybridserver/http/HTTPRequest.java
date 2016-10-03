@@ -1,12 +1,14 @@
 package es.uvigo.esei.dai.hybridserver.http;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HTTPRequest {
 	
@@ -15,14 +17,16 @@ public class HTTPRequest {
 	private String resourceChain;
 	private String resourceName; //Variable o Calcularlo a partir del resourceChain?
 	private String[] resourcePath;
-	private ArrayList<String> pathList = new ArrayList<String>();
+	private List<String> pathList = new ArrayList<>();
 	
 	//Se utilizan LinkedHashMap en lugar de HashMap para evitar un fallo en HTTPRequest.toString
 	
-	private Map<String, String> headerParameters = new LinkedHashMap<String, String>();
-	private Map<String, String> resourceParameters = new LinkedHashMap<String, String>();
-	private StringBuilder content = new StringBuilder();
+	private Map<String, String> headerParameters = new LinkedHashMap<>();
+	private Map<String, String> resourceParameters = new LinkedHashMap<>();
+	private String content = null;
 
+	//Mover todo esto del constructor a un metodo 'process'
+	
 	public HTTPRequest(Reader reader) throws IOException, HTTPParseException {
 	
 		
@@ -35,34 +39,9 @@ public class HTTPRequest {
 		 
 		 line = bufferedReader.readLine();
 		 
-//		 Pattern pattern = Pattern.compile("([A-Z]+) (.*) (HTTP/[0-9.]+)");
-//		 Matcher matcher = pattern.matcher(line);
-//		 matcher.find();
-		 
-//		 pattern = Pattern.compile("/([^/].[^/?]*)\\??");
-//		 matcher = pattern.matcher(resourceChain);
-//		 
-//		 while (matcher.find()) {
-//			 pathList.add(matcher.group(1));
-//		 }
-		 
-		 
-//		 resourcePath = new String[pathList.size()];
-//			pathList.toArray(resourcePath);
-//		 		 	
-//		 pattern = Pattern.compile("([A-Za-z-/]+): (.+)");
-//		 System.out.println(line);
-//		 while ((line = bufferedReader.readLine()) != null) {
-//			 System.out.println(line);
-//			 matcher = pattern.matcher(line);
-//			 if (matcher.find()) {
-//				 headerParameters.put(matcher.group(1), matcher.group(2));
-//			 }
-//		 }		
-		 
 		 // Se crea una regla que va a reconocer el método, el path y la version
 		 
-		 Pattern pattern = Pattern.compile("([A-Z]+) (.*) (HTTP/[0-9.]+)");
+		 Pattern pattern = Pattern.compile("(GET|POST|PUT|DELETE|HEAD|TRACE|OPTIONS|CONNECT) (.*) (HTTP/[0-9.]+)");
 		 Matcher matcher = pattern.matcher(line);
 		 matcher.find();
 		 
@@ -85,7 +64,7 @@ public class HTTPRequest {
 		 
 		 //Se crea otro patron para coger el path a partir de resourceName
 		 
-		 pattern = Pattern.compile("([^/].[^/]*)");
+		 pattern = Pattern.compile("([^/]+)");
 		 matcher = pattern.matcher(resourceName);
 		 
 		 //Se crea una lista con los valores que va a tener el array del Path
@@ -117,7 +96,7 @@ public class HTTPRequest {
 		 
 		 //Se van añadiendo los parametros al mapa<parametro,valor> headerParameters
 		 
-		 while ((line = bufferedReader.readLine()) != null) {
+		 while (!(line = bufferedReader.readLine()).isEmpty()) {
 			 System.out.println(line);
 			 matcher = pattern.matcher(line);
 			 if (matcher.find()) {
@@ -125,14 +104,12 @@ public class HTTPRequest {
 			 }
 		 }
 		 
-		 //Guarda el content en un string
+		 int lenght;
 		 
-		 content = null;
-		 
-		 while ((line = bufferedReader.readLine()) != null) {
-			 
-			 content.append(line);			 			
-			 
+		 if ((lenght = this.getContentLength()) != 0) {
+			 char[] buffer = new char[lenght];
+			 bufferedReader.read(buffer ,0 ,lenght);
+			 content = buffer.toString();
 		 }
 		 
 		 
@@ -176,20 +153,15 @@ public class HTTPRequest {
 
 	public String getContent() {
 		// TODO Auto-generated method stub
-		if (content == null){
-			return null;
-		}else{
-			return content.toString();
-		}
+		return content;
 	}
 
 	public int getContentLength() {
 		// TODO Auto-generated method stub
-		
-		if (content == null){
+		if (headerParameters.containsKey("Content-Length")) {
+			return Integer.parseInt(headerParameters.get("Content-Length"));
+		} else {
 			return 0;
-		}else{
-			return content.length();
 		}
 	}
 
