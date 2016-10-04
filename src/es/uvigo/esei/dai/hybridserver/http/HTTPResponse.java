@@ -7,31 +7,39 @@ import java.util.List;
 import java.util.Map;
 
 public class HTTPResponse {
+	
+	private String httpVersion;
+	private HTTPResponseStatus httpStatus;
+	private String content;
+	
 	public HTTPResponse() {
 	}
 
 	public HTTPResponseStatus getStatus() {
 		// TODO Auto-generated method stub
-		return null;
+		return httpStatus;
 	}
 
 	public void setStatus(HTTPResponseStatus status) {
+		this.httpStatus = status;
 	}
 
 	public String getVersion() {
 		// TODO Auto-generated method stub
-		return null;
+		return httpVersion;
 	}
 
 	public void setVersion(String version) {
+		this.httpVersion = version;
 	}
 
 	public String getContent() {
 		// TODO Auto-generated method stub
-		return null;
+		return content;
 	}
 
 	public void setContent(String content) {
+		this.content = content;
 	}
 
 	public Map<String, String> getParameters() {
@@ -63,6 +71,17 @@ public class HTTPResponse {
 	}
 
 	public void print(Writer writer) throws IOException {
+		
+		final StringBuilder sb = new StringBuilder(this.getVersion()).append(" ").append(this.getStatus().getCode())
+				.append(" ").append(this.getStatus().getStatus()).append("\r\n");
+				
+		if(this.getContent() != null) {
+			sb.append(this.getContent());
+		}
+		
+		sb.append("\r\n");
+		
+		writer.write(sb.toString());
 	}
 
 	@Override

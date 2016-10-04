@@ -92,12 +92,12 @@ public class HTTPRequest {
 		 //Se crea un patron para coger los parametros de la cabecera en las siguientes linea
 		 
 		 pattern = Pattern.compile("([A-Za-z-/]+): (.+)");
-		 System.out.println(line);
+		// System.out.println(line);
 		 
 		 //Se van añadiendo los parametros al mapa<parametro,valor> headerParameters
 		 
 		 while (!(line = bufferedReader.readLine()).isEmpty()) {
-			 System.out.println(line);
+			 //System.out.println(line);
 			 matcher = pattern.matcher(line);
 			 if (matcher.find()) {
 				 headerParameters.put(matcher.group(1), matcher.group(2));
@@ -112,8 +112,7 @@ public class HTTPRequest {
 			 content = buffer.toString();
 		 }
 		 
-		 
-		 //System.out.println(this.toString());
+		 System.out.println(this.toString());
 	}
 
 	public HTTPRequestMethod getMethod() {
