@@ -3,6 +3,7 @@ package es.uvigo.esei.dai.hybridserver.http;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +13,13 @@ public class HTTPResponse {
 	private HTTPResponseStatus httpStatus;
 	private String content;
 	
-	public HTTPResponse() {
+	private Map <String, String> parameters = new LinkedHashMap <String, String> ();
+	
+	public HTTPResponse(String httpVersion, HTTPResponseStatus httpStatus, String content) {
+		
+		this.httpVersion = httpVersion;
+		this.httpStatus = httpStatus;
+		this.content = content;
 	}
 
 	public HTTPResponseStatus getStatus() {
@@ -44,22 +51,22 @@ public class HTTPResponse {
 
 	public Map<String, String> getParameters() {
 		// TODO Auto-generated method stub
-		return null;
+		return parameters;
 	}
 
 	public String putParameter(String name, String value) {
 		// TODO Auto-generated method stub
-		return null;
+		return parameters.put(name, value);
 	}
 
 	public boolean containsParameter(String name) {
 		// TODO Auto-generated method stub
-		return false;
+		return parameters.containsKey(name);
 	}
 
 	public String removeParameter(String name) {
 		// TODO Auto-generated method stub
-		return null;
+		return parameters.remove(name);
 	}
 
 	public void clearParameters() {
@@ -67,6 +74,7 @@ public class HTTPResponse {
 
 	public List<String> listParameters() {
 		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
