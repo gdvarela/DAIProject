@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class HTTPResponse {
 	
@@ -13,13 +15,11 @@ public class HTTPResponse {
 	private HTTPResponseStatus httpStatus;
 	private String content;
 	
-	private Map <String, String> parameters = new LinkedHashMap <String, String> ();
+	private Map <String, String> parameters = new LinkedHashMap <> ();
 	
-	public HTTPResponse(String httpVersion, HTTPResponseStatus httpStatus, String content) {
+	//No se puede cambiar el constructor porque los test están hechos para éste
+	public HTTPResponse() {
 		
-		this.httpVersion = httpVersion;
-		this.httpStatus = httpStatus;
-		this.content = content;
 	}
 
 	public HTTPResponseStatus getStatus() {
@@ -69,14 +69,30 @@ public class HTTPResponse {
 		return parameters.remove(name);
 	}
 
+	//Elimina todas las entradas del mapa
+
 	public void clearParameters() {
+		
+		for (Entry<String, String> aux : parameters.entrySet()){
+			parameters.remove(aux.getKey());
+		}
+		
 	}
+	
+	//Devuelve una lista del tipo "Clave1 - Valor1, Clave2 - Valor2"
 
 	public List<String> listParameters() {
 		// TODO Auto-generated method stub
+		List <String> toRet = new LinkedList<>();
 		
-		return null;
+		for (Entry<String, String> aux : parameters.entrySet()){
+			toRet.add(aux.getKey() + " - " + aux.getValue());
+		}
+		
+		return toRet;
 	}
+	
+	//Escribe en el writer la version, el estado y el contenido
 
 	public void print(Writer writer) throws IOException {
 		
@@ -90,6 +106,7 @@ public class HTTPResponse {
 		sb.append("\r\n");
 		
 		writer.write(sb.toString());
+				
 	}
 
 	@Override
@@ -100,6 +117,7 @@ public class HTTPResponse {
 			this.print(writer);
 		} catch (IOException e) {
 		}
+		
 
 		return writer.toString();
 	}

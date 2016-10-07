@@ -19,16 +19,20 @@ public class Launcher {
 							 
 					 HTTPRequest httpRequest = new HTTPRequest(new InputStreamReader(clientSocket.getInputStream()));
 					 
-					 HTTPResponse httpResponse = new HTTPResponse
-							 (httpRequest.getHttpVersion(), HTTPResponseStatus.S200, httpRequest.getContent());
+					 HTTPResponse httpResponse = new HTTPResponse();
+					 
+					 httpResponse.setVersion(httpRequest.getHttpVersion());
+					 httpResponse.setStatus(HTTPResponseStatus.S200);
+					 httpResponse.setContent(httpRequest.getContent());
 					 
 					 httpResponse.putParameter("Content-Type", httpRequest.getHeaderParameters().get("Content-Type"));
-					 httpResponse.putParameter("Content-Type", httpRequest.getHeaderParameters().get("Content-Type"));
+					 httpResponse.putParameter("Content-Encoding", httpRequest.getHeaderParameters().get("Content-Encoding"));		 
+					 httpResponse.putParameter("Content-Language", httpRequest.getHeaderParameters().get("Content-Language"));
 					 
-					 
-					 httpResponse.putParameter("Content-Type", httpRequest.getHeaderParameters().get("Content-Type"));
-					 
+					 	 
 					 httpResponse.print(new OutputStreamWriter(clientSocket.getOutputStream()));
+					 
+					 
 				 } 
 			 }
 		 } catch (IOException e) {
