@@ -99,12 +99,17 @@ public class HTTPResponse {
 		final StringBuilder sb = new StringBuilder(this.getVersion()).append(" ").append(this.getStatus().getCode())
 				.append(" ").append(this.getStatus().getStatus()).append("\r\n");
 				
-		if(this.getContent() != null) {
-			sb.append(this.getContent());
+		for (Map.Entry<String, String> param : this.getParameters().entrySet()) {
+			sb.append(param.getKey()).append(": ").append(param.getValue()).append("\r\n");
 		}
 		
-		sb.append("\r\n");
-		
+		if(this.getContent() != null) {
+			sb.append("Content-Length: " + this.getContent().length()).append("\r\n\r\n");
+			sb.append(this.getContent());
+		} else {
+			sb.append("\r\n");	
+		}
+			
 		writer.write(sb.toString());
 				
 	}

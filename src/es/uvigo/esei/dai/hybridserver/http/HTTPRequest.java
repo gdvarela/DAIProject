@@ -104,12 +104,32 @@ public class HTTPRequest {
 			 }
 		 }
 		 
+		 
+		 
+		 // Para el contenido hay que diferencial el metodo 
 		 int lenght;
 		 
 		 if ((lenght = this.getContentLength()) != 0) {
+			 
 			 char[] buffer = new char[lenght];
 			 bufferedReader.read(buffer ,0 ,lenght);
-			 content = buffer.toString();
+			 
+			 switch (this.getMethod()) {
+				case GET:
+					content = buffer.toString();
+					break;
+					
+				case POST:
+					pattern = Pattern.compile("message=(.*)");
+					matcher = pattern.matcher(buffer.toString());
+					System.out.println(buffer.toString());
+//					matcher.find();
+//					content = matcher.group(1);
+					break;
+
+				default:
+					break;
+				}
 		 }
 		 
 		 System.out.println(this.toString());
