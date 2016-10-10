@@ -50,6 +50,8 @@ public class HybridServer {
 							 
 							 httpResponse.setVersion(httpRequest.getHttpVersion());
 							 httpResponse.setStatus(HTTPResponseStatus.S200);
+							 
+							 // Comprobar esto
 							 httpResponse.setContent("asdasd");
 							 httpResponse.putParameter("Content-Length", "6");
 							 httpResponse.putParameter("Content-Type", "text/html");
