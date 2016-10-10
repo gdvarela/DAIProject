@@ -104,8 +104,6 @@ public class HTTPRequest {
 			 }
 		 }
 		 
-		 
-		 
 		 // Para el contenido hay que diferencial el metodo 
 		 int lenght;
 		 
@@ -120,13 +118,12 @@ public class HTTPRequest {
 					break;
 					
 				case POST:
-					pattern = Pattern.compile("message=(.*)");
-					matcher = pattern.matcher(buffer.toString());
-					System.out.println(buffer.toString());
+//					pattern = Pattern.compile("message=(.*)");
+//					matcher = pattern.matcher(buffer.toString());
 //					matcher.find();
 //					content = matcher.group(1);
 					break;
-
+					
 				default:
 					break;
 				}
