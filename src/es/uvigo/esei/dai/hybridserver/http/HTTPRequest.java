@@ -3,6 +3,7 @@ package es.uvigo.esei.dai.hybridserver.http;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,15 +42,36 @@ public class HTTPRequest {
 		 
 		 // Se crea una regla que va a reconocer el método, el path y la version
 		 
-		 Pattern pattern = Pattern.compile("(GET|POST|PUT|DELETE|HEAD|TRACE|OPTIONS|CONNECT) (.*) (HTTP/[0-9.]+)");
+		 Pattern pattern = Pattern.compile("(GET|POST|PUT|DELETE|HEAD|TRACE|OPTIONS|CONNECT) ");
 		 Matcher matcher = pattern.matcher(line);
-		 matcher.find();
 		 
-		 //Se asignan los valores encontrados a sus variables
+		 try {
+			 matcher.find();
+			 this.method = HTTPRequestMethod.valueOf(matcher.group(1));
+		 } catch (java.lang.IllegalStateException e) {
+			 throw new HTTPParseException("Missing Method");
+		}
 		 
-		 this.method = HTTPRequestMethod.valueOf(matcher.group(1));
-		 this.resourceChain = matcher.group(2);
-		 this.httpVersion = matcher.group(3);
+		 try {
+			 pattern = Pattern.compile(" (.*) ");
+			 matcher = pattern.matcher(line);
+			  
+			 matcher.find();
+			 this.resourceChain = matcher.group(1);
+
+		 } catch (java.lang.IllegalStateException e) {
+			 throw new HTTPParseException("Missing resource");
+		}
+		 
+		 try {
+			 pattern = Pattern.compile(" (HTTP/[0-9.]+)");
+			 matcher = pattern.matcher(line);
+			 
+			 matcher.find();
+			 this.httpVersion = matcher.group(1);
+		 } catch (java.lang.IllegalStateException e) {
+			 throw new HTTPParseException("Missing version");
+		}
 		 
 		 //Se crea otro patron para coger nombre y parametros del recurso a partir de resourceChain
 		 
@@ -95,41 +117,43 @@ public class HTTPRequest {
 		// System.out.println(line);
 		 
 		 //Se van añadiendo los parametros al mapa<parametro,valor> headerParameters
-		 
-		 while (!(line = bufferedReader.readLine()).isEmpty()) {
-			 //System.out.println(line);
-			 matcher = pattern.matcher(line);
-			 if (matcher.find()) {
-				 headerParameters.put(matcher.group(1), matcher.group(2));
+		 try {
+			 while (!(line = bufferedReader.readLine()).isEmpty()) {
+				 //System.out.println(line);
+				 matcher = pattern.matcher(line);
+				 if (matcher.find()) {
+					 headerParameters.put(matcher.group(1), matcher.group(2));
+				 }
 			 }
-		 }
-		 
+		} catch (Exception e) {
+			 throw new HTTPParseException("Invalid header");
+		}
+		  
 		 // Para el contenido hay que diferencial el metodo 
-		 int lenght;
+		 int length;
 		 
-		 if ((lenght = this.getContentLength()) != 0) {
+		 if ((length = this.getContentLength()) != 0) {
 			 
-			 char[] buffer = new char[lenght];
-			 bufferedReader.read(buffer ,0 ,lenght);
+			 char[] buffer = new char[length];
+			 bufferedReader.read(buffer ,0 ,length);
 			 
-			 switch (this.getMethod()) {
-				case GET:
-					content = buffer.toString();
-					break;
+			 content = new String (buffer);
+			 String type = headerParameters.get("Content-Type");
+
+			 if (type != null && type.startsWith("application/x-www-form-urlencoded")) {
+		 		 content = URLDecoder.decode(content, "UTF-8");
+			 } 
+			 
+			 if (this.getMethod() == HTTPRequestMethod.POST) {
+				 
+				 pattern = Pattern.compile("([^&].[^&]*)=([^&].[^&]*)");
+				 matcher = pattern.matcher(content);
 					
-				case POST:
-//					pattern = Pattern.compile("message=(.*)");
-//					matcher = pattern.matcher(buffer.toString());
-//					matcher.find();
-//					content = matcher.group(1);
-					break;
-					
-				default:
-					break;
-				}
+				 while (matcher.find()) {
+						 resourceParameters.put(matcher.group(1), matcher.group(2));
+				 }
+			 }	
 		 }
-		 
-		 System.out.println(this.toString());
 	}
 
 	public HTTPRequestMethod getMethod() {

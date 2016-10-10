@@ -109,9 +109,9 @@ public class HTTPResponse {
 		} else {
 			sb.append("\r\n");	
 		}
-			
+		
+		System.out.println(sb.toString());
 		writer.write(sb.toString());
-				
 	}
 
 	@Override

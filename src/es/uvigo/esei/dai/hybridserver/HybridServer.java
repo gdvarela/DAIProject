@@ -1,10 +1,17 @@
 package es.uvigo.esei.dai.hybridserver;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 import java.util.Properties;
+
+import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
+import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
+import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
+import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 
 public class HybridServer {
 	private static final int SERVICE_PORT = 8888;
@@ -35,8 +42,24 @@ public class HybridServer {
 					while (true) {
 						try (Socket socket = serverSocket.accept()) {
 							if (stop) break;
-							
-							// Responder al cliente
+				
+							 HTTPRequest httpRequest = new HTTPRequest(new InputStreamReader(socket.getInputStream()));
+							 
+							 System.out.print(httpRequest.toString());
+							 HTTPResponse httpResponse = new HTTPResponse();
+							 
+							 httpResponse.setVersion(httpRequest.getHttpVersion());
+							 httpResponse.setStatus(HTTPResponseStatus.S200);
+							 httpResponse.setContent("asdasd");
+							 httpResponse.putParameter("Content-Length", "6");
+							 httpResponse.putParameter("Content-Type", "text/html");
+							 httpResponse.putParameter("Content-Encoding", "deflate");		 
+							 httpResponse.putParameter("Content-Language", "en");
+							 
+							 httpResponse.print(new OutputStreamWriter(socket.getOutputStream()));
+							 
+						} catch (HTTPParseException e) {
+							e.printStackTrace();
 						}
 					}
 				} catch (IOException e) {
