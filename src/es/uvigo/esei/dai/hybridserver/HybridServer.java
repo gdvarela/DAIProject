@@ -51,11 +51,9 @@ public class HybridServer {
 							 httpResponse.setVersion(httpRequest.getHttpVersion());
 							 httpResponse.setStatus(HTTPResponseStatus.S200);
 							 
-							 // Comprobar esto
-							 httpResponse.setContent("asdasd");
-							 httpResponse.putParameter("Content-Length", "6");
+							 httpResponse.setContent("Hybrid Server");
 							 httpResponse.putParameter("Content-Type", "text/html");
-							 httpResponse.putParameter("Content-Encoding", "deflate");		 
+							 httpResponse.putParameter("Content-Encoding", "UTF-8");		 
 							 httpResponse.putParameter("Content-Language", "en");
 							 
 							 httpResponse.print(new OutputStreamWriter(socket.getOutputStream()));
