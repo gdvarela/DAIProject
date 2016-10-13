@@ -96,7 +96,8 @@ public class HTTPResponse {
 
 	public void print(Writer writer) throws IOException {
 		
-		final StringBuilder sb = new StringBuilder(this.getVersion()).append(" ").append(this.getStatus().getCode())
+		final StringBuilder sb = new StringBuilder(this.getVersion()).append(" ")
+			.append(this.getStatus().getCode())
 				.append(" ").append(this.getStatus().getStatus()).append("\r\n");
 				
 		for (Map.Entry<String, String> param : this.getParameters().entrySet()) {
@@ -112,8 +113,6 @@ public class HTTPResponse {
 		System.out.println(sb.toString());
 		writer.write(sb.toString());
 		writer.flush();
-		writer.close();
-		
 	}
 
 	@Override

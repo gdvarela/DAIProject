@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
 
@@ -53,9 +54,8 @@ public class HybridServer {
 							 
 							 httpResponse.setContent("Hybrid Server");
 							 httpResponse.putParameter("Content-Type", "text/html");
-							 httpResponse.putParameter("Content-Encoding", "UTF-8");		 
 							 httpResponse.putParameter("Content-Language", "en");
-							 
+
 							 httpResponse.print(new OutputStreamWriter(socket.getOutputStream()));
 							 
 						} catch (HTTPParseException e) {
