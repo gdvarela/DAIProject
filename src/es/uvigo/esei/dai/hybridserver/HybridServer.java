@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
@@ -40,27 +42,13 @@ public class HybridServer {
 			@Override
 			public void run() {
 				try (final ServerSocket serverSocket = new ServerSocket(SERVICE_PORT)) {
+					
+					ExecutorService threadPool = Executors.newFixedThreadPool(50);
 					while (true) {
-						try (Socket socket = serverSocket.accept()) {
-							if (stop) break;
-				
-							 HTTPRequest httpRequest = new HTTPRequest(new InputStreamReader(socket.getInputStream()));
-							 
-							 System.out.print(httpRequest.toString());
-							 HTTPResponse httpResponse = new HTTPResponse();
-							 
-							 httpResponse.setVersion(httpRequest.getHttpVersion());
-							 httpResponse.setStatus(HTTPResponseStatus.S200);
-							 
-							 httpResponse.setContent("Hybrid Server");
-							 httpResponse.putParameter("Content-Type", "text/html");
-							 httpResponse.putParameter("Content-Language", "en");
-
-							 httpResponse.print(new OutputStreamWriter(socket.getOutputStream()));
-							 
-						} catch (HTTPParseException e) {
-							e.printStackTrace();
-						}
+						Socket clientSocket = serverSocket.accept();
+						
+						if (stop) break;
+						threadPool.execute(new ServiceThread(clientSocket));
 					}
 				} catch (IOException e) {
 					e.printStackTrace();

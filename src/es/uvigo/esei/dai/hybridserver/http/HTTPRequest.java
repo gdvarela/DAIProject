@@ -114,7 +114,6 @@ public class HTTPRequest {
 		 //Se crea un patron para coger los parametros de la cabecera en las siguientes linea
 		 
 		 pattern = Pattern.compile("([A-Za-z-/]+): (.+)");
-		// System.out.println(line);
 		 
 		 //Se van añadiendo los parametros al mapa<parametro,valor> headerParameters
 		 try {
