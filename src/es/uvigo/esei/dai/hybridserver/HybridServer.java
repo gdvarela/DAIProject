@@ -15,18 +15,22 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
+import es.uvigo.esei.dai.hybridserver.http.HtmlDAO;
+import es.uvigo.esei.dai.hybridserver.http.HtmlMapDAO;
 
 public class HybridServer {
 	private static final int SERVICE_PORT = 8888;
 	private Thread serverThread;
 	private boolean stop;
-
+	public HtmlDAO htmlDAO = new HtmlMapDAO();
+	
 	public HybridServer() {
 		// TODO Auto-generated constructor stub
 	}
 	
 	public HybridServer(Map<String, String> pages) {
 		// TODO Auto-generated constructor stub
+		htmlDAO.setPages(pages);
 	}
 
 	public HybridServer(Properties properties) {
@@ -48,7 +52,7 @@ public class HybridServer {
 						Socket clientSocket = serverSocket.accept();
 						
 						if (stop) break;
-						threadPool.execute(new ServiceThread(clientSocket));
+						threadPool.execute(new ServiceThread(clientSocket, htmlDAO));
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
