@@ -1,0 +1,5 @@
+numClients=50
+port=8000
+db.url=jdbc:mysql://localhost:3306/DAI_DB
+db.user=admin
+db.password=admin

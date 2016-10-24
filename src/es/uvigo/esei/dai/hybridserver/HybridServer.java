@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -16,25 +17,40 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 import es.uvigo.esei.dai.hybridserver.http.HtmlDAO;
+import es.uvigo.esei.dai.hybridserver.http.HtmlDBDAO;
 import es.uvigo.esei.dai.hybridserver.http.HtmlMapDAO;
 
 public class HybridServer {
-	private static final int SERVICE_PORT = 8888;
+	
+	private static int SERVICE_PORT = 8888;
+	private static int NUM_CLIENTS = 50;
+	private static String DB_USER;
+	private static String DB_PASS;
+	private static String DB_URL;
+	
 	private Thread serverThread;
 	private boolean stop;
-	public HtmlDAO htmlDAO = new HtmlMapDAO();
 	
+	public HtmlDAO htmlDAO;
+
 	public HybridServer() {
 		// TODO Auto-generated constructor stub
 	}
 	
 	public HybridServer(Map<String, String> pages) {
 		// TODO Auto-generated constructor stub
+		htmlDAO = new HtmlMapDAO();
 		htmlDAO.setPages(pages);
 	}
 
-	public HybridServer(Properties properties) {
+	public HybridServer(Properties properties) throws SQLException {
 		// TODO Auto-generated constructor stub
+		SERVICE_PORT = Integer.parseInt(properties.getProperty("port"));
+		NUM_CLIENTS = Integer.parseInt(properties.getProperty("numClients"));
+		DB_USER = properties.getProperty("db.user");
+		DB_PASS = properties.getProperty("db.password");
+		DB_URL = properties.getProperty("db.url");
+		htmlDAO = new HtmlDBDAO(DB_URL, DB_USER, DB_PASS);
 	}
 
 	public int getPort() {

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.sql.SQLException;
 
 import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
@@ -17,6 +18,7 @@ public class ServiceThread implements Runnable{
 
 	private Socket socket;
 	private HtmlDAO htmlDAO;
+	private String welocomePage = "<b>Hybrid Server</b><br>Guillermo Davila Varela<br>Samuel Ramilo Conde";
 	
 	public ServiceThread(Socket socket, HtmlDAO htmlDAO) {
 		this.socket = socket;
@@ -79,13 +81,15 @@ public class ServiceThread implements Runnable{
 				
 				httpResponse.putParameter("Content-Type", "text/html");
 				httpResponse.putParameter("Content-Language", "en");
+			} else if (httpRequest.getResourceName().equals("")){
+				httpResponse.setContent(welocomePage);
 			} else {
 				httpResponse.setStatus(HTTPResponseStatus.S400);
 			}
 			
 			httpResponse.print(new OutputStreamWriter(socket.getOutputStream()));
 		
-		} catch (IOException | HTTPParseException e) {
+		} catch (IOException | HTTPParseException | SQLException e) {
 			 e.printStackTrace(); //Cambiar Esto
 		}
 	}
