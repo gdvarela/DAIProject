@@ -12,29 +12,36 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPRequestMethod;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 import es.uvigo.esei.dai.hybridserver.http.HtmlDAO;
+import es.uvigo.esei.dai.hybridserver.http.HtmlDBDAO;
 import es.uvigo.esei.dai.hybridserver.http.HtmlMapDAO;
 
 public class ServiceThread implements Runnable{
 
 	private Socket socket;
-	private HtmlDAO htmlDAO;
 	private String welocomePage = "<b>Hybrid Server</b><br>Guillermo Davila Varela<br>Samuel Ramilo Conde";
+	private String DB_URL;
+	private String DB_PASS;
+	private String DB_USER;
+	private HTTPResponse httpResponse = new HTTPResponse();
 	
-	public ServiceThread(Socket socket, HtmlDAO htmlDAO) {
+	public ServiceThread(Socket socket, String DB_URL, String DB_USER, String  DB_PASS) {
 		this.socket = socket;
-		this.htmlDAO = htmlDAO;
+		this.DB_PASS = DB_PASS;
+		this.DB_URL = DB_URL;
+		this.DB_USER = DB_USER;
 	}
 	
 	@Override
 	public void run() {
-		try (Socket socket = this.socket) {
+		try {
+			
 			HTTPRequest httpRequest = new HTTPRequest(new InputStreamReader(socket.getInputStream()));
-			 
-			HTTPResponse httpResponse = new HTTPResponse();
-			 
+		 
 			httpResponse.setVersion(httpRequest.getHttpVersion());
 			httpResponse.setStatus(HTTPResponseStatus.S200);
 			String uuid = httpRequest.getResourceParameters().get("uuid");
+			
+			HtmlDAO htmlDAO  = new HtmlDBDAO(DB_URL, DB_USER, DB_PASS);
 			
 			if (httpRequest.getResourceName().equals("html")) {
 				
@@ -86,11 +93,18 @@ public class ServiceThread implements Runnable{
 			} else {
 				httpResponse.setStatus(HTTPResponseStatus.S400);
 			}
-			
-			httpResponse.print(new OutputStreamWriter(socket.getOutputStream()));
 		
 		} catch (IOException | HTTPParseException | SQLException e) {
-			 e.printStackTrace(); //Cambiar Esto
+			e.printStackTrace();
+			httpResponse.setStatus(HTTPResponseStatus.S500);
+		} finally {
+			try {
+				httpResponse.print(new OutputStreamWriter(socket.getOutputStream()));
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.err.println("ERROR: outputStream");
+			}
 		}
 	}
 

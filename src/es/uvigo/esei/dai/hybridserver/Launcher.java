@@ -14,17 +14,16 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 import java.io.*;
 
 public class Launcher {
+	
+	private static Properties DEFAULT_PROPERTIES;
+	
 	public static void main(String[] args) throws IOException, SQLException {
-		
-		Map<String, String> pagesExample = new HashMap<>();
-		
-		pagesExample.put("1234", "Hola 1234");
-		pagesExample.put("1111", "Hola 1111");
 		
 		HybridServer server;
 		
 		if (args.length < 1) {
-			server = new HybridServer(pagesExample);
+			setDefaultProperties();
+			server = new HybridServer(DEFAULT_PROPERTIES);
 		} else {
 			Properties properties = new Properties();
 			
@@ -35,5 +34,14 @@ public class Launcher {
 			server = new HybridServer(properties);
 		}
 		server.start();
+	}
+	
+	private static void setDefaultProperties() {
+		
+		DEFAULT_PROPERTIES.setProperty("numClients", "50");
+		DEFAULT_PROPERTIES.setProperty("port", "8888");
+		DEFAULT_PROPERTIES.setProperty("db.url", "jdbc:mysql://localhost:3306/hstestdb");
+		DEFAULT_PROPERTIES.setProperty("db.user", "hsdb");
+		DEFAULT_PROPERTIES.setProperty("db.password", "hsdbpass");
 	}
 }

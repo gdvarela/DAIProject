@@ -43,14 +43,13 @@ public class HybridServer {
 		htmlDAO.setPages(pages);
 	}
 
-	public HybridServer(Properties properties) throws SQLException {
+	public HybridServer(Properties properties) {
 		// TODO Auto-generated constructor stub
 		SERVICE_PORT = Integer.parseInt(properties.getProperty("port"));
 		NUM_CLIENTS = Integer.parseInt(properties.getProperty("numClients"));
 		DB_USER = properties.getProperty("db.user");
 		DB_PASS = properties.getProperty("db.password");
-		DB_URL = properties.getProperty("db.url");
-		htmlDAO = new HtmlDBDAO(DB_URL, DB_USER, DB_PASS);
+		DB_URL = properties.getProperty("db.url");	
 	}
 
 	public int getPort() {
@@ -68,7 +67,7 @@ public class HybridServer {
 						Socket clientSocket = serverSocket.accept();
 						
 						if (stop) break;
-						threadPool.execute(new ServiceThread(clientSocket, htmlDAO));
+						threadPool.execute(new ServiceThread(clientSocket, DB_URL,  DB_USER, DB_PASS ));
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
