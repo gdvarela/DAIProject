@@ -18,16 +18,9 @@ public class HtmlDBDAO implements HtmlDAO {
 	public HtmlDBDAO(String url, String user, String pass) throws SQLException {
 		connection = DriverManager.getConnection(url, user, pass);
 	}
-	
-	@Override
-	public void setPages(Map<String, String> map) {
-		// TODO Auto-generated method stub
-	}
 
 	@Override
-	public String getHTML(String uuid) throws SQLException {
-		// TODO Auto-generated method stub
-		
+	public String getHTML(String uuid) throws SQLException {		
 		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM HTML WHERE uuid = ?")) {
 			statement.setString(1, uuid);
 			ResultSet result = statement.executeQuery();
@@ -39,7 +32,6 @@ public class HtmlDBDAO implements HtmlDAO {
 
 	@Override
 	public String setHTML(String content) throws SQLException {
-		// TODO Auto-generated method stub
 		UUID randomUuid = UUID.randomUUID();
 		String uuid = randomUuid.toString();
 		
@@ -59,11 +51,11 @@ public class HtmlDBDAO implements HtmlDAO {
 
 	@Override
 	public boolean hasUuid(String uuid) throws SQLException {
-		// TODO Auto-generated method stub
 		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM HTML WHERE uuid = ?")) {
 			statement.setString(1, uuid);
+			ResultSet result = statement.executeQuery();
 			
-			if (statement.execute()) {
+			if (result.first()) {
 				return true;
 			} else {
 				return false;
@@ -73,7 +65,6 @@ public class HtmlDBDAO implements HtmlDAO {
 
 	@Override
 	public String deleteHTML(String uuid) throws SQLException {
-		// TODO Auto-generated method stub
 		String toRet;
 		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM HTML WHERE uuid = ?")) {
 			statement.setString(1, uuid);
@@ -97,7 +88,6 @@ public class HtmlDBDAO implements HtmlDAO {
 
 	@Override
 	public List<String> list() throws SQLException {
-		// TODO Auto-generated method stub
 		List<String> toRet = new LinkedList<>();
 		
 		try (Statement statement = connection.createStatement()) {

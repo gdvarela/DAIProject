@@ -6,7 +6,6 @@ import java.util.Map;
 
 public interface HtmlDAO {
 
-	public void setPages(Map<String, String> map);
 	public String getHTML(String uuid) throws SQLException;
 	public String setHTML(String content) throws SQLException;
 	public boolean hasUuid(String uuid) throws SQLException;

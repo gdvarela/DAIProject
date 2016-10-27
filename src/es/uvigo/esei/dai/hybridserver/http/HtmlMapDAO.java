@@ -11,11 +11,7 @@ public class HtmlMapDAO implements HtmlDAO {
 
 	private Map<String, String> htmlMap;
 	
-	public HtmlMapDAO() {
-	}
-	
-	@Override
-	public void setPages(Map<String, String> map) {
+	public HtmlMapDAO(Map<String, String> map) {
 		this.htmlMap = map;
 	}
 	

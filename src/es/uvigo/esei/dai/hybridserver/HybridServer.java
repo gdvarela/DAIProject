@@ -17,12 +17,15 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 import es.uvigo.esei.dai.hybridserver.http.HtmlDAO;
+import es.uvigo.esei.dai.hybridserver.http.HtmlDAOFactory;
 import es.uvigo.esei.dai.hybridserver.http.HtmlDBDAO;
+import es.uvigo.esei.dai.hybridserver.http.HtmlDBDAOFactory;
 import es.uvigo.esei.dai.hybridserver.http.HtmlMapDAO;
+import es.uvigo.esei.dai.hybridserver.http.HtmlMapDAOFactory;
 
 public class HybridServer {
 	
-	private static int SERVICE_PORT = 8888;
+	private static int SERVICE_PORT = 8000;
 	private static int NUM_CLIENTS = 50;
 	private static String DB_USER;
 	private static String DB_PASS;
@@ -31,25 +34,22 @@ public class HybridServer {
 	private Thread serverThread;
 	private boolean stop;
 	
-	public HtmlDAO htmlDAO;
+	private HtmlDAOFactory htmlFactory;
 
 	public HybridServer() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public HybridServer(Map<String, String> pages) {
-		// TODO Auto-generated constructor stub
-		htmlDAO = new HtmlMapDAO();
-		htmlDAO.setPages(pages);
+		htmlFactory = new HtmlMapDAOFactory(pages);
 	}
 
-	public HybridServer(Properties properties) {
-		// TODO Auto-generated constructor stub
+	public HybridServer(Properties properties) throws SQLException {
 		SERVICE_PORT = Integer.parseInt(properties.getProperty("port"));
 		NUM_CLIENTS = Integer.parseInt(properties.getProperty("numClients"));
 		DB_USER = properties.getProperty("db.user");
 		DB_PASS = properties.getProperty("db.password");
 		DB_URL = properties.getProperty("db.url");	
+		htmlFactory = new HtmlDBDAOFactory(DB_URL, DB_USER, DB_PASS);
 	}
 
 	public int getPort() {
@@ -61,13 +61,13 @@ public class HybridServer {
 			@Override
 			public void run() {
 				try (final ServerSocket serverSocket = new ServerSocket(SERVICE_PORT)) {
-					
-					ExecutorService threadPool = Executors.newFixedThreadPool(50);
+					 
+					ExecutorService threadPool = Executors.newFixedThreadPool(NUM_CLIENTS);
 					while (true) {
 						Socket clientSocket = serverSocket.accept();
 						
 						if (stop) break;
-						threadPool.execute(new ServiceThread(clientSocket, DB_URL,  DB_USER, DB_PASS ));
+						threadPool.execute(new ServiceThread(clientSocket, htmlFactory));
 					}
 				} catch (IOException e) {
 					e.printStackTrace();

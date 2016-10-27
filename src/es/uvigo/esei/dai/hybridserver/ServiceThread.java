@@ -12,23 +12,21 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPRequestMethod;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 import es.uvigo.esei.dai.hybridserver.http.HtmlDAO;
+import es.uvigo.esei.dai.hybridserver.http.HtmlDAOFactory;
 import es.uvigo.esei.dai.hybridserver.http.HtmlDBDAO;
 import es.uvigo.esei.dai.hybridserver.http.HtmlMapDAO;
 
 public class ServiceThread implements Runnable{
 
 	private Socket socket;
-	private String welocomePage = "<b>Hybrid Server</b><br>Guillermo Davila Varela<br>Samuel Ramilo Conde";
-	private String DB_URL;
-	private String DB_PASS;
-	private String DB_USER;
+	private String welocomePage = "<b> Hybrid Server </b><br>Guillermo Davila Varela<br>Samuel Ramilo Conde<br><a href=/html> Listado Archivos </a> <form action=html method=POST> <textarea name=html></textarea><button type=”submit”>Submit</button></form>";
+
 	private HTTPResponse httpResponse = new HTTPResponse();
+	private HtmlDAOFactory htmlFactory;
 	
-	public ServiceThread(Socket socket, String DB_URL, String DB_USER, String  DB_PASS) {
+	public ServiceThread(Socket socket, HtmlDAOFactory htmlFactory) {
 		this.socket = socket;
-		this.DB_PASS = DB_PASS;
-		this.DB_URL = DB_URL;
-		this.DB_USER = DB_USER;
+		this.htmlFactory = htmlFactory;
 	}
 	
 	@Override
@@ -39,11 +37,12 @@ public class ServiceThread implements Runnable{
 		 
 			httpResponse.setVersion(httpRequest.getHttpVersion());
 			httpResponse.setStatus(HTTPResponseStatus.S200);
+			
 			String uuid = httpRequest.getResourceParameters().get("uuid");
 			
-			HtmlDAO htmlDAO  = new HtmlDBDAO(DB_URL, DB_USER, DB_PASS);
-			
 			if (httpRequest.getResourceName().equals("html")) {
+				
+				HtmlDAO htmlDAO = htmlFactory.create();
 				
 				switch (httpRequest.getMethod()) {
 				case POST:
@@ -59,12 +58,11 @@ public class ServiceThread implements Runnable{
 					if (httpRequest.getResourceParameters().isEmpty()) {
 						
 						final StringBuilder sb = new StringBuilder();
-							sb.append("<html>");
+							sb.append("<b>Lista Archivos</b>");
 						for(String s: htmlDAO.list()) {
 							sb.append(s);
 							sb.append("<br>");
 						}
-							sb.append("</html>");
 						httpResponse.setContent(sb.toString());
 					} else {
 						
@@ -79,6 +77,8 @@ public class ServiceThread implements Runnable{
 				case DELETE:
 						if (htmlDAO.deleteHTML(uuid) == null) {
 							httpResponse.setStatus(HTTPResponseStatus.S404);
+						} else {
+							httpResponse.setContent("<b>Se ha eliminado la pagina</b>");
 						};
 					break;
 					

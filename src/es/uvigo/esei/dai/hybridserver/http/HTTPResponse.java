@@ -23,7 +23,6 @@ public class HTTPResponse {
 	}
 
 	public HTTPResponseStatus getStatus() {
-		// TODO Auto-generated method stub
 		return httpStatus;
 	}
 
@@ -32,7 +31,6 @@ public class HTTPResponse {
 	}
 
 	public String getVersion() {
-		// TODO Auto-generated method stub
 		return httpVersion;
 	}
 
@@ -41,7 +39,6 @@ public class HTTPResponse {
 	}
 
 	public String getContent() {
-		// TODO Auto-generated method stub
 		return content;
 	}
 
@@ -50,22 +47,18 @@ public class HTTPResponse {
 	}
 
 	public Map<String, String> getParameters() {
-		// TODO Auto-generated method stub
 		return parameters;
 	}
 
 	public String putParameter(String name, String value) {
-		// TODO Auto-generated method stub
 		return parameters.put(name, value);
 	}
 
 	public boolean containsParameter(String name) {
-		// TODO Auto-generated method stub
 		return parameters.containsKey(name);
 	}
 
 	public String removeParameter(String name) {
-		// TODO Auto-generated method stub
 		return parameters.remove(name);
 	}
 
@@ -82,7 +75,6 @@ public class HTTPResponse {
 	//Devuelve una lista del tipo "Clave1 - Valor1, Clave2 - Valor2"
 
 	public List<String> listParameters() {
-		// TODO Auto-generated method stub
 		List <String> toRet = new LinkedList<>();
 		
 		for (Entry<String, String> aux : parameters.entrySet()){
