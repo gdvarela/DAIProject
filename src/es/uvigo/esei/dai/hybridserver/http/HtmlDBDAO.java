@@ -93,7 +93,7 @@ public class HtmlDBDAO implements HtmlDAO {
 		try (Statement statement = connection.createStatement()) {
 			try (ResultSet result = statement.executeQuery("SELECT * FROM HTML")) {
 				while (result.next()) {
-					toRet.add("<a href=http://localhost:8000/html?uuid=" + result.getString("uuid") + ">" + result.getString("uuid") + "</a>");
+					toRet.add(result.getString("uuid"));
 				}
 			}
 		}

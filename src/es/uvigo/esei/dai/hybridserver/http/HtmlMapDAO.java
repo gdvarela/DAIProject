@@ -47,7 +47,7 @@ public class HtmlMapDAO implements HtmlDAO {
 		List <String> toRet = new LinkedList<>();
 		
 		for (Entry<String, String> aux : htmlMap.entrySet()){
-			toRet.add(aux.getKey() + " - " + aux.getValue());
+			toRet.add(aux.getKey());
 		}
 		
 		return toRet;

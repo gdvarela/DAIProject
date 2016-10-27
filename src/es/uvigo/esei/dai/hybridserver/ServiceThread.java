@@ -60,6 +60,7 @@ public class ServiceThread implements Runnable{
 						final StringBuilder sb = new StringBuilder();
 							sb.append("<b>Lista Archivos</b>");
 						for(String s: htmlDAO.list()) {
+							sb.append("<a href=http://localhost:8000/html?uuid=" + s + "</a>");
 							sb.append(s);
 							sb.append("<br>");
 						}
