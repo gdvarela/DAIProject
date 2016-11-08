@@ -70,6 +70,10 @@ public class HtmlDBDAO implements HtmlDAO {
 			statement.setString(1, uuid);
 			ResultSet result = statement.executeQuery();
 			
+			if (!result.first()) {
+				throw new SQLException("Delete invalid uuid");
+			}
+			
 			result.next();
 			toRet =  result.getString("content");
 		}

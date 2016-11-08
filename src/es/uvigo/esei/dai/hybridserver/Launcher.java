@@ -15,7 +15,7 @@ import java.io.*;
 
 public class Launcher {
 	
-	private static Properties DEFAULT_PROPERTIES;
+	private static Properties DEFAULT_PROPERTIES = new Properties();
 	
 	public static void main(String[] args) throws IOException, SQLException {
 		

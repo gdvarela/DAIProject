@@ -58,10 +58,9 @@ public class ServiceThread implements Runnable{
 					if (httpRequest.getResourceParameters().isEmpty()) {
 						
 						final StringBuilder sb = new StringBuilder();
-							sb.append("<b>Lista Archivos</b>");
+							sb.append("<b>Lista Archivos</b><br>");
 						for(String s: htmlDAO.list()) {
-							sb.append("<a href=http://localhost:8000/html?uuid=" + s + "</a>");
-							sb.append(s);
+							sb.append("<a href=http://localhost:" + socket.getLocalPort() + "/html?uuid=" + s + "> " + s +" </a>");
 							sb.append("<br>");
 						}
 						httpResponse.setContent(sb.toString());
@@ -76,11 +75,8 @@ public class ServiceThread implements Runnable{
 					break;
 
 				case DELETE:
-						if (htmlDAO.deleteHTML(uuid) == null) {
-							httpResponse.setStatus(HTTPResponseStatus.S404);
-						} else {
-							httpResponse.setContent("<b>Se ha eliminado la pagina</b>");
-						};
+						htmlDAO.deleteHTML(uuid);
+						httpResponse.setContent("<b>Se ha eliminado la pagina</b>");
 					break;
 					
 				default:
@@ -96,8 +92,12 @@ public class ServiceThread implements Runnable{
 			}
 		
 		} catch (IOException | HTTPParseException | SQLException e) {
-			e.printStackTrace();
-			httpResponse.setStatus(HTTPResponseStatus.S500);
+			if(e.getMessage().equals("Delete invalid uuid")) {
+				httpResponse.setStatus(HTTPResponseStatus.S404);
+			} else {
+				e.printStackTrace();
+				httpResponse.setStatus(HTTPResponseStatus.S500);
+			}
 		} finally {
 			try {
 				httpResponse.print(new OutputStreamWriter(socket.getOutputStream()));

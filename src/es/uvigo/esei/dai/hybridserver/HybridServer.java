@@ -25,11 +25,11 @@ import es.uvigo.esei.dai.hybridserver.http.HtmlMapDAOFactory;
 
 public class HybridServer {
 	
-	private static int SERVICE_PORT = 8000;
-	private static int NUM_CLIENTS = 50;
-	private static String DB_USER;
-	private static String DB_PASS;
-	private static String DB_URL;
+	private int SERVICE_PORT = 8000;
+	private int NUM_CLIENTS = 50;
+	private String DB_USER;
+	private String DB_PASS;
+	private String DB_URL;
 	
 	private Thread serverThread;
 	private boolean stop;
