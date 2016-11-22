@@ -62,6 +62,10 @@ public class ServiceThread implements Runnable{
 		} catch (IOException | HTTPParseException | SQLException e) {
 			if(e.getMessage().equals("Delete invalid uuid")) {
 				httpResponse.setStatus(HTTPResponseStatus.S404);
+			} else if (e.getMessage().equals("Xsd null")){
+				httpResponse.setStatus(HTTPResponseStatus.S400);
+			} else if (e.getMessage().equals("xsd not found")) {
+				httpResponse.setStatus(HTTPResponseStatus.S404);
 			} else {
 				e.printStackTrace();
 				httpResponse.setStatus(HTTPResponseStatus.S500);
@@ -84,23 +88,27 @@ public class ServiceThread implements Runnable{
 		switch (resource) {
 		case "html": 
 			dbDAO = new HtmlDBDAO(dbConnection);
+			httpResponse.putParameter("Content-Type", "text/html");
 			break;
 		case "xsd":
 			dbDAO = new XsdDBDAO(dbConnection);
+			httpResponse.putParameter("Content-Type", "application/xml");
 			break;
 		case "xml":
 			dbDAO = new XmlDBDAO(dbConnection);
+			httpResponse.putParameter("Content-Type", "application/xml");
 			break;
 		case "xslt":
 			dbDAO = new XsltDBDAO(dbConnection);
+			httpResponse.putParameter("Content-Type", "application/xml");
 			break;
 		}
 		
 		switch (httpRequest.getMethod()) {
 		case POST:
-			if (httpRequest.getResourceParameters().containsKey("html")) {
-				uuid = dbDAO.setContent(httpRequest.getResourceParameters().get("html"));
-				httpResponse.setContent("<a href=\"html?uuid=" + uuid + "\">" + uuid + "</a>");
+			if (httpRequest.getResourceParameters().containsKey(resource)) {
+				uuid = dbDAO.setContent(httpRequest.getResourceParameters().get(resource), httpRequest.getResourceParameters().get("xsd"));
+				httpResponse.setContent("<a href=\"" + resource + "?uuid=" + uuid + "\">" + uuid + "</a>");
 			} else {
 				httpResponse.setStatus(HTTPResponseStatus.S400);
 			}
@@ -134,8 +142,6 @@ public class ServiceThread implements Runnable{
 		default:
 			break;
 		}
-		
-		httpResponse.putParameter("Content-Type", "text/html");
 		httpResponse.putParameter("Content-Language", "en");
 	}
 }

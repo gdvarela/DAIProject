@@ -29,7 +29,7 @@ public class XmlDBDAO implements DBDAO {
 	}
 
 	@Override
-	public String setContent(String content) throws SQLException {
+	public String setContent(String content, String xsd) throws SQLException {
 		UUID randomUuid = UUID.randomUUID();
 		String uuid = randomUuid.toString();
 

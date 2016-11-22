@@ -28,23 +28,40 @@ public class XsltDBDAO implements DBDAO {
 	}
 
 	@Override
-	public String setContent(String content) throws SQLException {
+	public String setContent(String content, String xsd) throws SQLException {
 		UUID randomUuid = UUID.randomUUID();
 		String uuid = randomUuid.toString();
+		
+		if (xsd==null) {
+			throw new SQLException("Xsd null");
+		} else {
+			try(PreparedStatement statement = connection
+					.prepareStatement("SELECT * FROM XSD WHERE uuid = ?")) {
+				statement.setString(1, xsd);
+				
+				ResultSet result = statement.executeQuery();
 
-		try (PreparedStatement statement = connection
-				.prepareStatement("INSERT INTO XSLT (uuid, content) " + "VALUES (?,?)")) {
-			statement.setString(1, uuid);
-			statement.setString(2, content);
+				if (result.first()) {
+					try (PreparedStatement insertStatement = connection
+							.prepareStatement("INSERT INTO XSLT (uuid, content, xsd) " + "VALUES (?,?,?)")) {
+						insertStatement.setString(1, uuid);
+						insertStatement.setString(2, content);
+						insertStatement.setString(3, xsd);
 
-			int result = statement.executeUpdate();
+						int resultado = insertStatement.executeUpdate();
 
-			if (result != 1) {
-				throw new SQLException("Unable to insert new page");
+						if (resultado != 1) {
+							throw new SQLException("Unable to insert new page");
+						}
+					}
+				} else {
+					throw new SQLException("xsd not found");
+				}
+				
+				return uuid;
 			}
 		}
-
-		return uuid;
+		
 	}
 
 	@Override
