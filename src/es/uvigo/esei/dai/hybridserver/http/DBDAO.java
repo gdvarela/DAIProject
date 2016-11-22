@@ -6,10 +6,10 @@ import java.util.Map;
 
 public interface DBDAO {
 
-	public String getHTML(String uuid) throws SQLException;
-	public String setHTML(String content) throws SQLException;
+	public String getContent(String uuid) throws SQLException;
+	public String setContent(String content) throws SQLException;
 	public boolean hasUuid(String uuid) throws SQLException;
-	public void deleteHTML(String uuid) throws SQLException;
+	public void deleteContent(String uuid) throws SQLException;
 	
 	public List<String> list() throws SQLException;
 }

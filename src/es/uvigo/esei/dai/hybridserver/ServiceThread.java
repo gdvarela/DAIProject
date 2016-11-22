@@ -15,6 +15,9 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
 import es.uvigo.esei.dai.hybridserver.http.DBDAO;
 import es.uvigo.esei.dai.hybridserver.http.DBDAOFactory;
 import es.uvigo.esei.dai.hybridserver.http.HtmlDBDAO;
+import es.uvigo.esei.dai.hybridserver.http.XmlDBDAO;
+import es.uvigo.esei.dai.hybridserver.http.XsdDBDAO;
+import es.uvigo.esei.dai.hybridserver.http.XsltDBDAO;
 
 public class ServiceThread implements Runnable{
 
@@ -38,61 +41,24 @@ public class ServiceThread implements Runnable{
 			httpResponse.setVersion(httpRequest.getHttpVersion());
 			httpResponse.setStatus(HTTPResponseStatus.S200);
 			
-			String uuid = httpRequest.getResourceParameters().get("uuid");
-			
 			Connection dbConnection = dbFactory.create();
 			
-			if (httpRequest.getResourceName().equals("html")) {
-				
-				DBDAO htmlDAO = new HtmlDBDAO(dbConnection);
-				
-				switch (httpRequest.getMethod()) {
-				case POST:
-					if (httpRequest.getResourceParameters().containsKey("html")) {
-						uuid = htmlDAO.setHTML(httpRequest.getResourceParameters().get("html"));
-						httpResponse.setContent("<a href=\"html?uuid=" + uuid + "\">" + uuid + "</a>");
-					} else {
-						httpResponse.setStatus(HTTPResponseStatus.S400);
-					}
+			String uuid = httpRequest.getResourceParameters().get("uuid");
+			
+			
+			switch (httpRequest.getResourceName()) {
+				case "html": case "xsd": case "xml": case "xslt":
+					manageResource(httpRequest, dbConnection, uuid, httpRequest.getResourceName());
 					break;
-				
-				case GET:
-					if (httpRequest.getResourceParameters().isEmpty()) {
-						
-						final StringBuilder sb = new StringBuilder();
-							sb.append("<b>Lista Archivos</b><br>");
-						for(String s: htmlDAO.list()) {
-							sb.append("<a href=http://localhost:" + socket.getLocalPort() + "/html?uuid=" + s + "> " + s +" </a>");
-							sb.append("<br>");
-						}
-						httpResponse.setContent(sb.toString());
-					} else {
-						
-						if (htmlDAO.hasUuid(uuid)) {
-							httpResponse.setContent(htmlDAO.getHTML(uuid));
-						} else {
-							httpResponse.setStatus(HTTPResponseStatus.S404);
-						}
-					}
+				case "":
+					httpResponse.setContent(welocomePage);
 					break;
-
-				case DELETE:
-						htmlDAO.deleteHTML(uuid);
-						httpResponse.setContent("<b>Se ha eliminado la pagina</b>");
-					break;
-					
 				default:
+					httpResponse.setStatus(HTTPResponseStatus.S400);
 					break;
-				}
-				
-				httpResponse.putParameter("Content-Type", "text/html");
-				httpResponse.putParameter("Content-Language", "en");
-			} else if (httpRequest.getResourceName().equals("")){
-				httpResponse.setContent(welocomePage);
-			} else {
-				httpResponse.setStatus(HTTPResponseStatus.S400);
 			}
-		
+			
+	
 		} catch (IOException | HTTPParseException | SQLException e) {
 			if(e.getMessage().equals("Delete invalid uuid")) {
 				httpResponse.setStatus(HTTPResponseStatus.S404);
@@ -111,4 +77,65 @@ public class ServiceThread implements Runnable{
 		}
 	}
 
+	private void manageResource(HTTPRequest httpRequest, Connection dbConnection, String uuid, String resource) throws SQLException {
+		
+		DBDAO dbDAO = null;
+		
+		switch (resource) {
+		case "html": 
+			dbDAO = new HtmlDBDAO(dbConnection);
+			break;
+		case "xsd":
+			dbDAO = new XsdDBDAO(dbConnection);
+			break;
+		case "xml":
+			dbDAO = new XmlDBDAO(dbConnection);
+			break;
+		case "xslt":
+			dbDAO = new XsltDBDAO(dbConnection);
+			break;
+		}
+		
+		switch (httpRequest.getMethod()) {
+		case POST:
+			if (httpRequest.getResourceParameters().containsKey("html")) {
+				uuid = dbDAO.setContent(httpRequest.getResourceParameters().get("html"));
+				httpResponse.setContent("<a href=\"html?uuid=" + uuid + "\">" + uuid + "</a>");
+			} else {
+				httpResponse.setStatus(HTTPResponseStatus.S400);
+			}
+			break;
+		
+		case GET:
+			if (httpRequest.getResourceParameters().isEmpty()) {
+				
+				final StringBuilder sb = new StringBuilder();
+					sb.append("<b>Lista Archivos</b><br>");
+				for(String s: dbDAO.list()) {
+					sb.append("<a href=http://localhost:" + socket.getLocalPort() + "/html?uuid=" + s + "> " + s +" </a>");
+					sb.append("<br>");
+				}
+				httpResponse.setContent(sb.toString());
+			} else {
+				
+				if (dbDAO.hasUuid(uuid)) {
+					httpResponse.setContent(dbDAO.getContent(uuid));
+				} else {
+					httpResponse.setStatus(HTTPResponseStatus.S404);
+				}
+			}
+			break;
+
+		case DELETE:
+			dbDAO.deleteContent(uuid);
+				httpResponse.setContent("<b>Se ha eliminado la pagina</b>");
+			break;
+			
+		default:
+			break;
+		}
+		
+		httpResponse.putParameter("Content-Type", "text/html");
+		httpResponse.putParameter("Content-Language", "en");
+	}
 }

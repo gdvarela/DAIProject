@@ -11,17 +11,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class HtmlDBDAO implements DBDAO {
+public class XsdDBDAO implements DBDAO {
 
 	private Connection connection;
 	
-	public HtmlDBDAO(Connection connection) throws SQLException {
+	public XsdDBDAO(Connection connection) throws SQLException {
 		this.connection = connection;
 	}
 
 	@Override
 	public String getContent(String uuid) throws SQLException {		
-		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM HTML WHERE uuid = ?")) {
+		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM XSD WHERE uuid = ?")) {
 			statement.setString(1, uuid);
 			ResultSet result = statement.executeQuery();
 			
@@ -35,7 +35,7 @@ public class HtmlDBDAO implements DBDAO {
 		UUID randomUuid = UUID.randomUUID();
 		String uuid = randomUuid.toString();
 		
-		try (PreparedStatement statement = connection.prepareStatement("INSERT INTO HTML (uuid, content) " + "VALUES (?,?)")) {
+		try (PreparedStatement statement = connection.prepareStatement("INSERT INTO XSD (uuid, content) " + "VALUES (?,?)")) {
 			statement.setString(1, uuid);
 			statement.setString(2, content);
 
@@ -51,7 +51,7 @@ public class HtmlDBDAO implements DBDAO {
 
 	@Override
 	public boolean hasUuid(String uuid) throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM HTML WHERE uuid = ?")) {
+		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM XSD WHERE uuid = ?")) {
 			statement.setString(1, uuid);
 			ResultSet result = statement.executeQuery();
 			
@@ -66,7 +66,7 @@ public class HtmlDBDAO implements DBDAO {
 	@Override
 	public void deleteContent(String uuid) throws SQLException {
 		String toRet;
-		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM HTML WHERE uuid = ?")) {
+		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM XSD WHERE uuid = ?")) {
 			statement.setString(1, uuid);
 			ResultSet result = statement.executeQuery();
 			
@@ -75,7 +75,7 @@ public class HtmlDBDAO implements DBDAO {
 			}
 		}
 		
-		try (PreparedStatement statement = connection.prepareStatement("DELETE FROM HTML WHERE uuid = ?")) {
+		try (PreparedStatement statement = connection.prepareStatement("DELETE FROM XSD WHERE uuid = ?")) {
 			statement.setString(1, uuid);
 			int result = statement.executeUpdate();
 			
@@ -90,7 +90,7 @@ public class HtmlDBDAO implements DBDAO {
 		List<String> toRet = new LinkedList<>();
 		
 		try (Statement statement = connection.createStatement()) {
-			try (ResultSet result = statement.executeQuery("SELECT * FROM HTML")) {
+			try (ResultSet result = statement.executeQuery("SELECT * FROM XSD")) {
 				while (result.next()) {
 					toRet.add(result.getString("uuid"));
 				}
