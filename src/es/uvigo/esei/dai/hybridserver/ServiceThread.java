@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
@@ -11,10 +12,9 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequestMethod;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
-import es.uvigo.esei.dai.hybridserver.http.HtmlDAO;
-import es.uvigo.esei.dai.hybridserver.http.HtmlDAOFactory;
+import es.uvigo.esei.dai.hybridserver.http.DBDAO;
+import es.uvigo.esei.dai.hybridserver.http.DBDAOFactory;
 import es.uvigo.esei.dai.hybridserver.http.HtmlDBDAO;
-import es.uvigo.esei.dai.hybridserver.http.HtmlMapDAO;
 
 public class ServiceThread implements Runnable{
 
@@ -22,11 +22,11 @@ public class ServiceThread implements Runnable{
 	private String welocomePage = "<b> Hybrid Server </b><br>Guillermo Davila Varela<br>Samuel Ramilo Conde<br><a href=/html> Listado Archivos </a> <form action=html method=POST> <textarea name=html></textarea><button type=”submit”>Submit</button></form>";
 
 	private HTTPResponse httpResponse = new HTTPResponse();
-	private HtmlDAOFactory htmlFactory;
+	private DBDAOFactory dbFactory = new DBDAOFactory();
 	
-	public ServiceThread(Socket socket, HtmlDAOFactory htmlFactory) {
+	public ServiceThread(Socket socket, DBDAOFactory dbFactory) {
 		this.socket = socket;
-		this.htmlFactory = htmlFactory;
+		this.dbFactory = dbFactory;
 	}
 	
 	@Override
@@ -40,9 +40,11 @@ public class ServiceThread implements Runnable{
 			
 			String uuid = httpRequest.getResourceParameters().get("uuid");
 			
+			Connection dbConnection = dbFactory.create();
+			
 			if (httpRequest.getResourceName().equals("html")) {
 				
-				HtmlDAO htmlDAO = htmlFactory.create();
+				DBDAO htmlDAO = new HtmlDBDAO(dbConnection);
 				
 				switch (httpRequest.getMethod()) {
 				case POST:

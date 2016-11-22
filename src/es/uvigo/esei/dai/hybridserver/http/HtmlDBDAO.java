@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class HtmlDBDAO implements HtmlDAO {
+public class HtmlDBDAO implements DBDAO {
 
 	private Connection connection;
 	
-	public HtmlDBDAO(String url, String user, String pass) throws SQLException {
-		connection = DriverManager.getConnection(url, user, pass);
+	public HtmlDBDAO(Connection connection) throws SQLException {
+		this.connection = connection;
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class HtmlDBDAO implements HtmlDAO {
 	}
 
 	@Override
-	public String deleteHTML(String uuid) throws SQLException {
+	public void deleteHTML(String uuid) throws SQLException {
 		String toRet;
 		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM HTML WHERE uuid = ?")) {
 			statement.setString(1, uuid);
@@ -73,9 +73,6 @@ public class HtmlDBDAO implements HtmlDAO {
 			if (!result.first()) {
 				throw new SQLException("Delete invalid uuid");
 			}
-			
-			result.next();
-			toRet =  result.getString("content");
 		}
 		
 		try (PreparedStatement statement = connection.prepareStatement("DELETE FROM HTML WHERE uuid = ?")) {
@@ -86,8 +83,6 @@ public class HtmlDBDAO implements HtmlDAO {
 				throw new SQLException("Unable to delete");
 			}
 		}
-		
-		return toRet;
 	}
 
 	@Override

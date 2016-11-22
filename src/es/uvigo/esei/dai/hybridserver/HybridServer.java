@@ -16,12 +16,9 @@ import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
 import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
 import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
-import es.uvigo.esei.dai.hybridserver.http.HtmlDAO;
-import es.uvigo.esei.dai.hybridserver.http.HtmlDAOFactory;
+import es.uvigo.esei.dai.hybridserver.http.DBDAO;
 import es.uvigo.esei.dai.hybridserver.http.HtmlDBDAO;
-import es.uvigo.esei.dai.hybridserver.http.HtmlDBDAOFactory;
-import es.uvigo.esei.dai.hybridserver.http.HtmlMapDAO;
-import es.uvigo.esei.dai.hybridserver.http.HtmlMapDAOFactory;
+import es.uvigo.esei.dai.hybridserver.http.DBDAOFactory;
 
 public class HybridServer {
 	
@@ -34,22 +31,18 @@ public class HybridServer {
 	private Thread serverThread;
 	private boolean stop;
 	
-	private HtmlDAOFactory htmlFactory;
+	private DBDAOFactory dbFactory;
 
 	public HybridServer() {
 	}
 	
-	public HybridServer(Map<String, String> pages) {
-		htmlFactory = new HtmlMapDAOFactory(pages);
-	}
-
 	public HybridServer(Properties properties) throws SQLException {
 		SERVICE_PORT = Integer.parseInt(properties.getProperty("port"));
 		NUM_CLIENTS = Integer.parseInt(properties.getProperty("numClients"));
 		DB_USER = properties.getProperty("db.user");
 		DB_PASS = properties.getProperty("db.password");
 		DB_URL = properties.getProperty("db.url");	
-		htmlFactory = new HtmlDBDAOFactory(DB_URL, DB_USER, DB_PASS);
+		dbFactory = new DBDAOFactory(DB_URL, DB_USER, DB_PASS);
 	}
 
 	public int getPort() {
@@ -67,7 +60,7 @@ public class HybridServer {
 						Socket clientSocket = serverSocket.accept();
 						
 						if (stop) break;
-						threadPool.execute(new ServiceThread(clientSocket, htmlFactory));
+						threadPool.execute(new ServiceThread(clientSocket, dbFactory));
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
