@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/validationConf" xmlns:tns="http://www.example.org/validationConf" elementFormDefault="qualified">
+	<element name="configuration">
+		 <complexType>
+			 <sequence>
+			 <element name="first" type="string"/>
+			 <element name="middle" type="string"/>
+			 <element name="last" type="string"/>
+			 </sequence>
+			 <attribute name="title" type="string"/>
+		 </complexType>
+	 </element>
+	 
+	 <complexType name="connection">
+		 <sequence>
+			 <element name="http" type="string" />
+			 <element name="webservice" type="string" />
+			 <element name="numClients" type="string" />
+		 </sequence>
+ 	</complexType>
+ 	
+ 	<complexType name="database">
+		 <sequence>
+			 <element name="user" type="string" />
+			 <element name="password" type="string" />
+			 <element name="url" type="string" />
+		 </sequence>
+ 	</complexType>
+ 	
+ 	<complexType name="servers">
+		 <sequence>
+			 <element name="user" type="string" />
+			 <element name="password" type="string" />
+			 <element name="url" type="string" />
+		 </sequence>
+ 	</complexType>
+
+</schema>
