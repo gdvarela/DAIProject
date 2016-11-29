@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/validationConf" xmlns:tns="http://www.example.org/validationConf" elementFormDefault="qualified">
+
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://www.esei.uvigo.es/dai/hybridserver" xmlns:tns="http://www.esei.uvigo.es/dai/hybridserver" elementFormDefault="qualified">
 	<element name="configuration">
 		 <complexType>
 			 <sequence>
-			 <element name="first" type="string"/>
-			 <element name="middle" type="string"/>
-			 <element name="last" type="string"/>
+				 <element name="connections" type="tns:connections"/>
+				 <element name="database" type="tns:database"/>
+				 <element name="servers" type="tns:servers"/>
 			 </sequence>
-			 <attribute name="title" type="string"/>
 		 </complexType>
 	 </element>
 	 
-	 <complexType name="connection">
+	 <complexType name="connections">
 		 <sequence>
 			 <element name="http" type="string" />
 			 <element name="webservice" type="string" />
@@ -29,10 +30,15 @@
  	
  	<complexType name="servers">
 		 <sequence>
-			 <element name="user" type="string" />
-			 <element name="password" type="string" />
-			 <element name="url" type="string" />
+			 <element name="server" type="tns:server" minOccurs="0" maxOccurs="unbounded"/>
 		 </sequence>
  	</complexType>
-
+ 	
+ 	<complexType name="server">
+		 <attribute name="name" type="string"/>
+		 <attribute name="wsdl" type="string"/>
+		 <attribute name="namespace" type="string"/>
+		 <attribute name="service" type="string"/>
+		 <attribute name="httpAddress" type="string"/>
+ 	</complexType>
 </schema>
