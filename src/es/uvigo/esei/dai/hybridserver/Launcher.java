@@ -20,18 +20,28 @@ public class Launcher {
 	public static void main(String[] args) throws IOException, SQLException {
 		
 		HybridServer server;
-		
+			
 		if (args.length < 1) {
 			setDefaultProperties();
 			server = new HybridServer(DEFAULT_PROPERTIES);
 		} else {
-			Properties properties = new Properties();
-			
 			File confFile = new File(args[0]);
 			FileInputStream input = new FileInputStream(confFile);
 			
-			properties.load(input);
-			server = new HybridServer(properties);
+			if(args[0].contains(".properties")) {
+				Properties properties = new Properties();	
+				properties.load(input);
+				server = new HybridServer(properties);
+			} else {
+//				int tamanoFichero = (int) confFile.length();
+//				byte[] buffer = new byte[tamanoFichero];
+//				
+//				input.read(buffer, 0, tamanoFichero);
+//				
+//				server = new HybridServer(buffer);
+				server = new HybridServer(confFile);
+			}
+			input.close();
 		}
 		server.start();
 	}

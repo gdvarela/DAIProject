@@ -1,5 +1,6 @@
 package es.uvigo.esei.dai.hybridserver;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -12,12 +13,16 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import es.uvigo.esei.dai.hybridserver.http.HTTPParseException;
-import es.uvigo.esei.dai.hybridserver.http.HTTPRequest;
-import es.uvigo.esei.dai.hybridserver.http.HTTPResponse;
-import es.uvigo.esei.dai.hybridserver.http.HTTPResponseStatus;
-import es.uvigo.esei.dai.hybridserver.http.DBDAO;
-import es.uvigo.esei.dai.hybridserver.http.HtmlDBDAO;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import es.uvigo.esei.dai.hybridserver.http.DBDAOFactory;
 
 public class HybridServer {
@@ -36,12 +41,29 @@ public class HybridServer {
 	public HybridServer() {
 	}
 	
-	public HybridServer(Properties properties) throws SQLException {
+	public HybridServer(Properties properties) {
 		SERVICE_PORT = Integer.parseInt(properties.getProperty("port"));
 		NUM_CLIENTS = Integer.parseInt(properties.getProperty("numClients"));
 		DB_USER = properties.getProperty("db.user");
 		DB_PASS = properties.getProperty("db.password");
-		DB_URL = properties.getProperty("db.url");	
+		DB_URL = properties.getProperty("db.url");
+		dbFactory = new DBDAOFactory(DB_URL, DB_USER, DB_PASS);
+	}
+	
+	public HybridServer(File confFile) {
+		
+		try {
+			Document conf = loadAndValidateWithExternalXSD(confFile);
+			SERVICE_PORT = Integer.parseInt(conf.getElementsByTagName("http").item(0).getTextContent()); 
+			NUM_CLIENTS = Integer.parseInt(conf.getElementsByTagName("numClients").item(0).getTextContent());
+			DB_USER = conf.getElementsByTagName("user").item(0).getTextContent();
+			DB_PASS = conf.getElementsByTagName("password").item(0).getTextContent();
+			DB_URL = conf.getElementsByTagName("url").item(0).getTextContent();
+		} catch (Exception e) {
+			System.out.println("Exception: "+e.getMessage());
+            System.exit(-1); 
+		}
+	
 		dbFactory = new DBDAOFactory(DB_URL, DB_USER, DB_PASS);
 	}
 
@@ -88,5 +110,18 @@ public class HybridServer {
 		}
 		
 		this.serverThread = null;
+	}
+	 
+	 public static Document loadAndValidateWithExternalXSD(File confFile) throws ParserConfigurationException, SAXException, IOException {
+			 SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			 Schema schema = schemaFactory.newSchema(new File("validationConf.xsd"));
+
+			 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			 factory.setValidating(false);
+			 factory.setNamespaceAware(true);
+			 factory.setSchema(schema);
+			 
+			 DocumentBuilder builder = factory.newDocumentBuilder();
+			 return builder.parse(confFile);
 	}
 }
