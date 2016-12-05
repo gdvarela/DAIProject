@@ -27,6 +27,8 @@ public class ServiceThread implements Runnable{
 	private HTTPResponse httpResponse = new HTTPResponse();
 	private DBDAOFactory dbFactory = new DBDAOFactory();
 	
+	private Connection dbConnection = null;
+	
 	public ServiceThread(Socket socket, DBDAOFactory dbFactory) {
 		this.socket = socket;
 		this.dbFactory = dbFactory;
@@ -41,7 +43,9 @@ public class ServiceThread implements Runnable{
 			httpResponse.setVersion(httpRequest.getHttpVersion());
 			httpResponse.setStatus(HTTPResponseStatus.S200);
 			
-			Connection dbConnection = dbFactory.create();
+			if (dbConnection == null && !httpRequest.getResourceName().equals("")) {
+				this.dbConnection = dbFactory.create();
+			}
 			
 			String uuid = httpRequest.getResourceParameters().get("uuid");
 			
@@ -60,6 +64,7 @@ public class ServiceThread implements Runnable{
 			
 	
 		} catch (IOException | HTTPParseException | SQLException e) {
+			e.printStackTrace();
 			if(e.getMessage().equals("Delete invalid uuid")) {
 				httpResponse.setStatus(HTTPResponseStatus.S404);
 			} else if (e.getMessage().equals("Xsd null")){

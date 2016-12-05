@@ -22,7 +22,7 @@ import es.uvigo.esei.dai.hybridserver.http.DBDAOFactory;
 
 public class HybridServer {
 	
-	private int SERVICE_PORT = 8000;
+	private int SERVICE_PORT = 8888;
 	private int NUM_CLIENTS = 50;
 	private String DB_USER;
 	private String DB_PASS;

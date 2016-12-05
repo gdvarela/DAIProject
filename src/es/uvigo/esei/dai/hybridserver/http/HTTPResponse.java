@@ -19,7 +19,7 @@ public class HTTPResponse {
 	
 	//No se puede cambiar el constructor porque los test están hechos para éste
 	public HTTPResponse() {
-		
+		this.httpVersion = HTTPHeaders.HTTP_1_1.getHeader();
 	}
 
 	public HTTPResponseStatus getStatus() {

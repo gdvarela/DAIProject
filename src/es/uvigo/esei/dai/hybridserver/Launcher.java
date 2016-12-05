@@ -41,7 +41,7 @@ public class Launcher {
 		DEFAULT_PROPERTIES.setProperty("numClients", "50");
 		DEFAULT_PROPERTIES.setProperty("port", "8888");
 		DEFAULT_PROPERTIES.setProperty("db.url", "jdbc:mysql://localhost:3306/hstestdb");
-		DEFAULT_PROPERTIES.setProperty("db.user", "hsdb");
-		DEFAULT_PROPERTIES.setProperty("db.password", "hsdbpass");
+		DEFAULT_PROPERTIES.setProperty("db.user", "dai");
+		DEFAULT_PROPERTIES.setProperty("db.password", "daipassword");
 	}
 }
